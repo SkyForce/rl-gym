@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+out/
+data/
+*.zip
+deck/node_modules/
+deck/*.pdf
+deck/*.pptx
+deck/ql/
+.DS_Store

@@ -1,0 +1,20 @@
+# Render.com deploy for the no-GPU, Token-Factory-backed secure-Terraform demo.
+# Push this repo, then in Render: New → Blueprint → pick this repo. Set the two
+# secret env vars (sync:false) in the dashboard; the rest come from here.
+services:
+  - type: web
+    name: rl-gym-demo
+    runtime: docker
+    dockerfilePath: docker/webdemo_tf.Dockerfile
+    plan: free                      # free tier sleeps when idle — fine for a demo
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: TF_BIG_MODEL
+        value: deepseek-ai/DeepSeek-V4-Pro
+      - key: TF_TUNED_MODEL          # your uploaded fine-tune id — set in dashboard
+        sync: false
+      - key: TOKEN_FACTORY_API_KEY    # secret — set in dashboard, never commit
+        sync: false
+      # To deploy a keyless canned demo first, add STUB=1 in the dashboard.

@@ -1,0 +1,19 @@
+# --- core (env + reward + eval; CPU-only, runs anywhere) ---
+numpy
+scikit-learn
+fastapi
+uvicorn
+pydantic
+requests
+# --- chat front-end (optional; conversational demo) ---
+gradio>=4              # browser chat UI (rl_gym.recsys.chat_ui)
+openai                 # OpenAI-compatible client for Ollama / vLLM / Nebius
+# --- training (GPU host, e.g. Nebius H100) ---
+trl>=0.14          # GRPOTrainer + GRPO vLLM integration land in 0.14
+transformers>=4.48
+accelerate
+datasets
+vllm        # fast rollout generation for GRPO
+torch
+# --- persistence: save/load checkpoints to S3 / Nebius Object Storage ---
+boto3       # rl_gym.meals.s3io (s3:// save/load, no HF Hub needed)

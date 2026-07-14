@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2080" height="940" viewBox="0 0 1040 470" font-family="Helvetica, Arial, sans-serif">
+  <rect width="2080" height="940" fill="#ffffff"/>
+  <text x="40" y="46" font-size="26" font-weight="700" fill="#16202e">The reward is a program</text>
+  <text x="40" y="72" font-size="15" fill="#5b6472">Soft pass-rate × hard gates — one critical failure zeroes the reward.</text>
+
+  <!-- column headers -->
+  <text x="290" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#3a4658">SOFT  ·  pass-rate over applicable rules</text>
+  <text x="600" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#3a4658">HARD GATES</text>
+  <text x="900" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#3a4658">REWARD</text>
+
+  <!-- ROW 1: clean config -->
+  <text x="40" y="195" font-size="15" font-weight="600" fill="#16202e">Clean config</text>
+  <rect x="175" y="176" width="230" height="26" rx="5" fill="#eef2f5" stroke="#cfd8e0"/>
+  <rect x="175" y="176" width="179" height="26" rx="5" fill="#0e7c7b"/>
+  <text x="264" y="194" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">14 / 18 pass</text>
+  <text x="415" y="195" font-size="15" font-weight="700" fill="#16202e">0.78</text>
+
+  <text x="462" y="196" font-size="17" fill="#5b6472">×</text>
+  <text x="492" y="184" font-size="13.5" fill="#2e7d5b" font-weight="600">✔ builds_required</text>
+  <text x="492" y="204" font-size="13.5" fill="#2e7d5b" font-weight="600">✔ no_critical</text>
+  <text x="690" y="195" font-size="16" fill="#5b6472">=</text>
+
+  <rect x="810" y="168" width="180" height="44" rx="8" fill="#e8f5ee" stroke="#2e7d5b"/>
+  <text x="900" y="196" text-anchor="middle" font-size="20" font-weight="700" fill="#2e7d5b">0.78</text>
+
+  <!-- divider -->
+  <line x1="40" y1="240" x2="990" y2="240" stroke="#e2e6ea" stroke-width="1"/>
+
+  <!-- ROW 2: hardcoded secret -->
+  <text x="40" y="319" font-size="15" font-weight="600" fill="#16202e">Hardcoded secret</text>
+  <rect x="175" y="300" width="230" height="26" rx="5" fill="#eef2f5" stroke="#cfd8e0"/>
+  <rect x="175" y="300" width="204" height="26" rx="5" fill="#0e7c7b"/>
+  <text x="277" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">16 / 18 pass</text>
+  <text x="415" y="319" font-size="15" font-weight="700" fill="#16202e">0.89</text>
+
+  <text x="462" y="320" font-size="17" fill="#5b6472">×</text>
+  <text x="492" y="308" font-size="13.5" fill="#2e7d5b" font-weight="600">✔ builds_required</text>
+  <text x="492" y="328" font-size="13.5" fill="#c0392b" font-weight="700">✘ no_critical</text>
+  <text x="690" y="319" font-size="16" fill="#5b6472">=</text>
+
+  <rect x="810" y="292" width="180" height="44" rx="8" fill="#fbeae8" stroke="#c0392b"/>
+  <text x="900" y="320" text-anchor="middle" font-size="20" font-weight="700" fill="#c0392b">0.00</text>
+
+  <!-- punchline -->
+  <text x="40" y="410" font-size="14.5" font-weight="600" fill="#16202e">No partial credit for being 90% clean.</text>
+  <text x="40" y="434" font-size="14.5" fill="#5b6472">A single critical failure zeroes the reward — even when the soft score is <tspan font-weight="700" fill="#16202e">higher</tspan> than the clean config's.</text>
+</svg>

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2240" height="1300" viewBox="0 0 1120 650" font-family="Helvetica, Arial, sans-serif">
+  <rect width="1120" height="650" fill="#ffffff"/>
+  <text x="40" y="46" font-size="27" font-weight="700" fill="#16202e">The rl-gym flywheel</text>
+  <text x="560" y="73" text-anchor="middle" font-size="15" fill="#5b6472">Two loops: served traffic → the next model, and logs × checkers → new rules.</text>
+
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#3a4658"/></marker>
+    <marker id="arrT" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0e7c7b"/></marker>
+    <marker id="arrP" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5c4ee5"/></marker>
+  </defs>
+
+  <!-- top pipeline -->
+  <g font-size="15" font-weight="600" fill="#16202e">
+    <rect x="40"  y="118" width="150" height="66" rx="10" fill="#eef2f5" stroke="#cfd8e0"/>
+    <text x="115" y="148" text-anchor="middle">SFT warm-start</text>
+    <text x="115" y="169" text-anchor="middle" font-size="12" font-weight="400" fill="#5b6472">fp32 LoRA</text>
+
+    <rect x="238" y="118" width="150" height="66" rx="10" fill="#d8ecec" stroke="#0e7c7b"/>
+    <text x="313" y="148" text-anchor="middle">GRPO (RLVR)</text>
+    <text x="313" y="169" text-anchor="middle" font-size="12" font-weight="400" fill="#5b6472">trl + vLLM, G=4</text>
+
+    <rect x="436" y="118" width="162" height="66" rx="10" fill="#eef2f5" stroke="#cfd8e0"/>
+    <text x="517" y="148" text-anchor="middle">Eval + audit</text>
+    <text x="517" y="169" text-anchor="middle" font-size="12" font-weight="400" fill="#5b6472">reward-hack check</text>
+
+    <rect x="646" y="118" width="148" height="66" rx="10" fill="#eef2f5" stroke="#cfd8e0"/>
+    <text x="720" y="148" text-anchor="middle">Serve</text>
+    <text x="720" y="169" text-anchor="middle" font-size="12" font-weight="400" fill="#5b6472">Nebius L40S / VPC</text>
+
+    <rect x="842" y="118" width="222" height="66" rx="10" fill="#eef2f5" stroke="#cfd8e0"/>
+    <text x="953" y="148" text-anchor="middle">Mine traffic</text>
+    <text x="953" y="169" text-anchor="middle" font-size="12" font-weight="400" fill="#5b6472">logs × Checkov diff</text>
+  </g>
+  <g stroke="#3a4658" stroke-width="2" fill="none">
+    <line x1="190" y1="151" x2="234" y2="151" marker-end="url(#arr)"/>
+    <line x1="388" y1="151" x2="432" y2="151" marker-end="url(#arr)"/>
+    <line x1="598" y1="151" x2="642" y2="151" marker-end="url(#arr)"/>
+    <line x1="794" y1="151" x2="838" y2="151" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- verifier -->
+  <rect x="238" y="248" width="360" height="66" rx="10" fill="#0e7c7b"/>
+  <text x="418" y="277" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">Deterministic verifier — 18 rules</text>
+  <text x="418" y="297" text-anchor="middle" font-size="12.5" fill="#cfeeed">soft pass-rate  ×  hard gates  =  reward</text>
+  <g stroke="#0e7c7b" stroke-width="2" fill="none">
+    <line x1="313" y1="248" x2="313" y2="186" marker-end="url(#arrT)"/>
+    <line x1="517" y1="248" x2="517" y2="186" marker-end="url(#arrT)"/>
+  </g>
+  <text x="333" y="234" font-size="12" fill="#0e7c7b" font-weight="600">reward</text>
+
+  <!-- ===== LOOP A: model flywheel (served traffic -> next model) ===== -->
+  <rect x="606" y="384" width="140" height="54" rx="9" fill="#fff4e0" stroke="#d98c1f" stroke-width="2"/>
+  <text x="676" y="405" text-anchor="middle" font-size="13" font-weight="700" fill="#8a5a10">gate</text>
+  <text x="676" y="424" text-anchor="middle" font-size="11.5" fill="#8a5a10">PROMOTE / BLOCK</text>
+  <g stroke="#3a4658" stroke-width="2" fill="none" stroke-dasharray="6 4">
+    <path d="M918,184 L918,411 L750,411" marker-end="url(#arr)"/>
+    <path d="M604,411 L200,411 L200,151 L232,151" marker-end="url(#arr)"/>
+  </g>
+  <text x="405" y="402" text-anchor="middle" font-size="12.5" fill="#3a4658" font-weight="600">served traffic → continual update → next model</text>
+
+  <!-- ===== LOOP B: the verifier grows (logs x checkers -> new rule) ===== -->
+  <rect x="596" y="506" width="256" height="60" rx="9" fill="#eef0fe" stroke="#5c4ee5" stroke-width="2"/>
+  <text x="724" y="530" text-anchor="middle" font-size="14" font-weight="700" fill="#3c3489">DeepSeek-V4-Pro</text>
+  <text x="724" y="550" text-anchor="middle" font-size="12" fill="#5c4ee5">drafts a new rule from the gap</text>
+
+  <rect x="402" y="506" width="150" height="60" rx="9" fill="#fff4e0" stroke="#d98c1f" stroke-width="2"/>
+  <text x="477" y="530" text-anchor="middle" font-size="13" font-weight="700" fill="#8a5a10">gate</text>
+  <text x="477" y="550" text-anchor="middle" font-size="11" fill="#8a5a10">sandbox · tests · human</text>
+
+  <g stroke="#5c4ee5" stroke-width="2" fill="none" stroke-dasharray="6 4">
+    <path d="M982,184 L982,536 L856,536" marker-end="url(#arrP)"/>
+    <path d="M594,536 L558,536" marker-end="url(#arrP)"/>
+    <path d="M400,536 L150,536 L150,281 L232,281" marker-end="url(#arrP)"/>
+  </g>
+  <text x="430" y="592" text-anchor="middle" font-size="12.5" fill="#5c4ee5" font-weight="600">blind spots → the big model drafts a new rule → the verifier grows</text>
+  <text x="175" y="271" font-size="11.5" fill="#5c4ee5" font-weight="600">grows</text>
+
+  <text x="40" y="632" font-size="12.5" fill="#8a94a2">Swap the Environment (Terraform → K8s → CI policy → …) and the same machine retargets. No human in either promotion.</text>
+</svg>

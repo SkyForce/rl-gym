@@ -1,0 +1,33 @@
+# Fly.io deploy for the no-GPU, Token-Factory-backed secure-Terraform demo.
+#
+#   fly launch --no-deploy --copy-config       # register the app (once)
+#   fly secrets set TOKEN_FACTORY_API_KEY=...   # never put the key in this file
+#   fly secrets set TF_TUNED_MODEL=<your-uploaded-fine-tune-id>
+#   fly deploy
+#
+# auto_stop/auto_start = scale to zero when idle, so it costs ~nothing between demos
+# (a cold start spins a machine back up on the next request in a second or two).
+app = "rl-gym-demo"
+primary_region = "iad"
+
+[build]
+  dockerfile = "docker/webdemo_tf.Dockerfile"
+
+[env]
+  PORT = "8000"
+  TF_BIG_MODEL = "deepseek-ai/DeepSeek-V4-Pro"
+  # Set STUB = "1" here to deploy a keyless canned demo; unset it once TF_TUNED_MODEL is live.
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.http_checks]
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

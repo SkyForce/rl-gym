@@ -1,0 +1,15 @@
+# The webdemo_tf image COPYs only rl_gym/ — keep the build context tiny.
+.git
+.gitignore
+**/__pycache__
+**/*.pyc
+*.ipynb
+*.zip
+out/
+deck/
+docs/
+scripts/
+tests/
+docker/
+data/
+requirements-gpu.txt

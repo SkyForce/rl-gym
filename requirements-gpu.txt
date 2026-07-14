@@ -1,0 +1,14 @@
+# GPU job deps (single source of truth for the Docker image AND the bare-image
+# fallback in scripts/nebius_iac.sh). Unpinned on purpose: `-U` lets pip resolve a
+# mutually-compatible torch/trl/transformers/vLLM set (they're co-developed), and the
+# Docker build freezes that resolution into the image (see /opt/rl-gym-freeze.txt).
+trl
+transformers
+vllm
+peft
+accelerate
+datasets
+boto3
+huggingface_hub
+sentencepiece
+tiktoken

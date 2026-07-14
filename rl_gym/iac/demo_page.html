@@ -1,0 +1,217 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rl-gym — secure Terraform demo</title>
+<style>
+body{font-family:-apple-system,Segoe UI,sans-serif;background:#0f1117;color:#e6e6e6;margin:0;padding:32px 16px;}
+.wrap{max-width:1060px;margin:0 auto;}
+h1{font-size:20px;font-weight:600;margin:0 0 4px;} .sub{color:#8b93a7;font-size:14px;margin:0 0 24px;}
+textarea{width:100%;box-sizing:border-box;background:#181c26;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:12px;font-size:15px;min-height:70px;resize:vertical;}
+input{width:100%;box-sizing:border-box;background:#181c26;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:10px 12px;font-size:13px;font-family:ui-monospace,monospace;}
+button{background:#4c6fff;color:#fff;border:0;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px;}
+button:disabled{opacity:.5;cursor:wait;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:24px;}
+.card{background:#161a24;border:1px solid #262c3a;border-radius:14px;padding:18px;}
+.card h3{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:baseline;}
+.reward{font-size:24px;font-weight:700;}
+.rule{display:flex;gap:8px;font-size:13px;font-family:ui-monospace,monospace;padding:2px 0;align-items:center;}
+.sev{margin-left:auto;font-size:11px;color:#8b93a7;}
+.ok{color:#4ade80;} .bad{color:#f87171;} .warn{color:#fbbf24;}
+.bar{height:6px;background:#262c3a;border-radius:3px;margin:10px 0;overflow:hidden;}
+.bar>div{height:100%;}
+.gate{display:inline-block;font-size:12px;padding:3px 10px;border-radius:12px;margin:2px 4px 2px 0;}
+.gp{background:#12351f;color:#4ade80;} .gf{background:#3a1418;color:#f87171;}
+pre{background:#10131b;border-radius:8px;padding:12px;font-size:11.5px;line-height:1.5;overflow-x:auto;max-height:340px;color:#c9d1e3;}
+.l{display:block;white-space:pre;}
+.l.sg{background:rgba(74,222,128,.10);}
+.l.sb{background:rgba(248,113,113,.16);}
+.chk{color:#22c55e;font-weight:700;} .nochk{color:transparent;}
+.legend{font-size:11px;color:#667;margin:6px 0 0;}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin:0 4px 0 10px;}
+.hint{color:#667;font-size:12px;margin-top:6px;}
+.status{color:#8b93a7;font-size:14px;margin-top:12px;}
+.chip{cursor:pointer;display:inline-block;background:#181c26;border:1px solid #2a3040;border-radius:14px;padding:5px 12px;font-size:12.5px;color:#aeb6c8;margin:0 6px 6px 0;}
+</style></head><body><div class="wrap">
+<h1>rl-gym — secure Terraform, live</h1>
+<p class="sub">Secure Terraform from an 8B open model, GRPO-tuned against a security scanner (verifiable reward + hard gates) and trained to repair its own findings. Type an infra request; the scanner judges every answer.</p>
+<div>
+<span class="chip" onclick="fill('an S3 bucket for customer invoices with KMS encryption, versioning, and no public access','aws_s3_bucket')">invoice bucket</span>
+<span class="chip" onclick="fill('a PostgreSQL RDS instance for the billing service, not publicly accessible, encrypted, 7-day backups','aws_db_instance')">billing RDS</span>
+<span class="chip" onclick="fill('an EC2 web server; HTTPS from anywhere, SSH only from 10.0.0.0/8, encrypted root volume, IMDSv2','aws_instance,aws_security_group')">web server</span>
+<span class="chip" onclick="fill('a Lambda function processing uploads with a CloudWatch log group with 30-day retention','aws_lambda_function,aws_cloudwatch_log_group')">lambda + logs</span>
+</div>
+<div id="presets"></div>
+<div id="driftbox" style="display:none;margin:8px 0 0;">
+  <label class="chip" style="user-select:none;border-color:#7a5c17;color:#fbbf24;">
+    <input type="checkbox" id="drift" style="width:auto;margin-right:6px;vertical-align:-2px;">
+    simulate a policy update — <b>5 new rules</b> take effect in the scanner; the same model (not retrained) adapts in-context via self-repair. The weights-level continual update is a separate ~$1.30 offline step.
+  </label>
+</div>
+<textarea id="req" placeholder="Describe the infrastructure you need...">an S3 bucket for customer invoices with KMS encryption, versioning, and no public access</textarea>
+<input id="required" placeholder="required resource types, comma-separated (drives the builds_required gate)" value="aws_s3_bucket">
+<div class="hint">the full system on every request: RL-tuned model → scanner best-of-4 → self-repair (the model reads its own findings and rewrites; the verifier ships the better pass) · flip the policy-update toggle to watch a continual update absorb 5 brand-new rules · base-model and frontier-API comparisons: see the presentation (measured at N=120)</div>
+<button id="go" onclick="run()">Generate + scan</button>
+<div class="status" id="status"></div>
+<div class="grid" id="out"></div>
+<div id="growbox" style="display:none;margin-top:30px;border-top:1px solid #262c3a;padding-top:22px;">
+  <h1 style="font-size:16px;">grow the verifier — a big model authors a new rule</h1>
+  <p class="sub" style="margin:0 0 12px;">A big open model (<span id="authmodel">…</span>) drafts a scanner predicate from a policy spec; an <b>AST sandbox</b> and <b>executable tests</b> vet it before it goes live. The generator is fungible because the artifact is verified — a big LLM writes verifiers, it never gets to be one.</p>
+  <select id="spec" style="width:auto;min-width:280px;display:inline-block;margin-right:8px;"></select>
+  <button id="authbtn" onclick="authorize()" style="margin-top:0;padding:10px 20px;font-size:14px;vertical-align:middle;">Author rule with big model</button>
+  <div id="authout" style="margin-top:14px;"></div>
+</div>
+</div>
+<script>
+function fill(r,t){document.getElementById('req').value=r;document.getElementById('required').value=t;}
+let DRIFT_SET=new Set();
+fetch('/config').then(r=>r.json()).then(j=>{
+  DRIFT_SET=new Set(j.drift_rules||[]);
+  if(j.drift_available) document.getElementById('driftbox').style.display='block';
+}).catch(()=>{});
+// curated showcase — best-of-4 (the real product; robust to per-sample noise)
+let MODE=null;   // {clean|policy} — set on chip click, cleared when you type
+const CURATED={
+  7:{tag:'clean 1.0',mode:'clean',note:'verifier-selected best of 4 — a perfect secure config',col:'#0F6E56'},
+  3:{tag:'self-repair',mode:'repair',note:'first attempt misses VPC flow logs → the model reads the finding and adds them → 1.00',col:'#5C4EE5'},
+  8:{tag:'new rule → instant adapt',mode:'policy',note:'the SCANNER gains a new rule (EBS-optimized); the SAME model adapts in-context via self-repair — no retraining → 1.00',col:'#854F0B'},
+};
+fetch('/presets').then(r=>r.json()).then(j=>{
+  if(!j.presets||!j.presets.length) return;
+  const w=document.getElementById('presets');
+  w.innerHTML='<div class="hint" style="margin:8px 0 4px">showcase cases — click one:</div>';
+  j.presets.filter(p=>CURATED[p.n]).sort((a,b)=>Object.keys(CURATED).indexOf(String(a.n))-Object.keys(CURATED).indexOf(String(b.n))).forEach(p=>{
+    const c=CURATED[p.n];
+    const el=document.createElement('span'); el.className='chip';
+    el.style.borderColor=c.col;
+    el.innerHTML=`<b style="color:${c.col}">${c.tag}</b> · ${p.req.length>28?p.req.slice(0,28)+'…':p.req}`;
+    el.title=c.note+'  —  '+p.req;
+    el.onclick=()=>{
+      fill(p.req,(p.required||[]).join(',')); MODE=c.mode;
+      const dr=document.getElementById('drift'); if(dr) dr.checked=(c.mode==='policy');
+      document.getElementById('status').textContent='▸ '+c.note;
+    };
+    w.appendChild(el);
+  });
+}).catch(()=>{});
+['req','required'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{MODE=null;}));
+function sevcls(s){return s==='critical'?'bad':(s==='low'?'':'warn');}
+const RISK=/("\*"|:\*"|0\.0\.0\.0\/0|publicly_accessible\s*=\s*true|acl\s*=\s*"public|(password|secret_key)\s*=\s*"[^$v]|force_destroy\s*=\s*true)/;
+const HARD=/(storage_encrypted|sse_algorithm|server_side_encryption|versioning|block_public|restrict_public|ignore_public|http_tokens|backup_retention|enable_key_rotation|retention_in_days|publicly_accessible\s*=\s*false|encrypted\s*=\s*true|prevent_destroy|flow_log|ebs_optimized|multi_az\s*=\s*true|kms_key_id|lifecycle\s*\{|aws_s3_bucket_lifecycle|description\s*=)/i;
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function hlHcl(text, otherText){
+  const other=new Set((otherText||'').split('\n').map(l=>l.trim()).filter(l=>l.length>3));
+  return (text||'').split('\n').map(line=>{
+    const t=line.trim(); let cls='l';
+    if(RISK.test(line)) cls+=' sb'; else if(HARD.test(line)) cls+=' sg';
+    // added/only-in-this-card lines get a bold green ✓ in a fixed left gutter
+    const added = otherText && t.length>3 && !other.has(t);
+    const gutter = added ? '<span class="chk">✓ </span>' : '<span class="nochk">✓ </span>';
+    return `<span class="${cls}">${gutter}${esc(line)||' '}</span>`;
+  }).join('');
+}
+function card(m, union, other){
+  const mine={}; m.card.rules.forEach(r=>mine[r.name]=r);
+  const list=(union&&union.length)?union:m.card.rules.map(r=>[r.name,r.sev]);
+  const badge=(n)=>DRIFT_SET.has(n)?' <b style="color:#fbbf24;font-size:10px;">NEW</b>':'';
+  const rules=list.map(([n,sev])=>{
+    const r=mine[n];
+    if(!r) return `<div class="rule" style="opacity:.42"><span>·</span> ${n}${badge(n)}<span class="sev">not triggered — resource absent</span></div>`;
+    return `<div class="rule"><span class="${r.ok?'ok':sevcls(r.sev)||'bad'}">${r.ok?'✓':'✗'}</span> ${n}${badge(n)}<span class="sev">${sev}</span></div>`;
+  }).join('');
+  const gates=Object.entries(m.card.gates||{}).map(([g,ok])=>`<span class="gate ${ok?'gp':'gf'}">${g} ${ok?'pass':'FAIL'}</span>`).join('');
+  const p=Math.round(m.card.pass_rate*100);
+  const col=m.card.reward>=0.8?'#4ade80':(m.card.reward>0?'#fbbf24':'#f87171');
+  let samp='';
+  if(m.samples&&m.samples.length>1){
+    const first=m.samples[0], n=m.samples.length;
+    samp=`<div style="font-size:11.5px;color:#8b93a7;margin:-4px 0 8px;">pass@1 <b style="color:${first>=0.8?'#4ade80':(first>0?'#fbbf24':'#f87171')}">${first.toFixed(2)}</b> → best of ${n} <b>${m.card.reward.toFixed(2)}</b><span style="color:#556"> · draws ${m.samples.map(x=>x.toFixed(2)).join(' ')}</span></div>`;
+  }
+  if(m.repair){
+    samp+=`<div style="font-size:11.5px;color:#8b93a7;margin:-2px 0 8px;">self-repair: ${m.repair.pass1.toFixed(2)} → <b style="color:${m.repair.final>=0.8?'#4ade80':'#fbbf24'}">${m.repair.final.toFixed(2)}</b>${m.repair.improved?' ▲ (model fixed its own findings)':' (kept first pass)'}</div>`;
+  }
+  return `<div class="card"><h3>${m.name}<span class="reward" style="color:${col}">${m.card.reward.toFixed(3)}</span></h3>${samp}
+    ${m.card.valid?rules:'<div class="rule bad">✗ malformed output (no resources parsed)</div>'}
+    <div class="bar"><div style="width:${p}%;background:${col}"></div></div>
+    <div>${gates}</div>
+    <div style="font-size:12px;color:#8b93a7;margin:8px 0 0;" title="${esc(m.cost_note||'')}">cost <b style="color:#e6e6e6">$${(m.cost_usd||0).toFixed(3)}</b>${m.secs!=null?` · ${m.secs.toFixed(1)}s`:' · recorded'}</div>
+    <details><summary style="color:#4c6fff;font-size:13px;cursor:pointer;margin-top:4px;">Terraform</summary>
+      <div class="legend"><i style="background:rgba(74,222,128,.45)"></i>hardening <i style="background:rgba(248,113,113,.5)"></i>risky <span class="chk" style="margin-left:10px">✓</span> added / only here</div>
+      <pre>${hlHcl(m.card.hcl, other&&other.card?other.card.hcl:'')}</pre></details>
+  </div>`;
+}
+async function run(){
+  const b=document.getElementById('go'), s=document.getElementById('status'), out=document.getElementById('out');
+  b.disabled=true; out.innerHTML='';
+  const driftEl=document.getElementById('drift');
+  const driftOn=!!(driftEl&&driftEl.checked)||MODE==='policy';
+  const body={req:document.getElementById('req').value,
+              required:document.getElementById('required').value.split(',').map(x=>x.trim()).filter(Boolean),
+              drift:driftOn, engines:['tuned']};
+  // best-of-4 everywhere (the real product, robust to per-sample noise). policy shows
+  // the before/after as two cards; clean/free-form fold auto-repair into one card.
+  // before/after showcases pin best-of-4 so the first attempt is always parseable and
+  // imperfect (pass@1 can occasionally whiff) — the fix stays reliably visible. Clean
+  // chips + free-form use the pass@1 + repair default (the recommended serving mode).
+  if(MODE==='repair'||MODE==='policy'){body.repair_ab=true; body.n=4;}
+  s.textContent='generating… (~15s)';
+  try{
+    const r=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(j.error){s.textContent='error: '+j.error; b.disabled=false; return;}
+    const ms=j.models||[];
+    const seen={}, union=[];
+    ms.forEach(m=>m.card.rules.forEach(rr=>{if(!seen[rr.name]){seen[rr.name]=1;union.push([rr.name,rr.sev]);}}));
+    out.innerHTML=ms.map((m,i)=>card(m,union,ms.length===2?ms[1-i]:null)).join('');
+    if(MODE==='policy'&&ms.length===2){
+      const a=ms[0].card.reward,f=ms[1].card.reward;
+      const nf=(ms[0].card.rules||[]).filter(r=>!r.ok&&DRIFT_SET.has(r.name)).map(r=>r.name);
+      s.textContent=`policy update · ${nf.length?('NEW rule '+nf[0]+' failed'):'new rules in effect'} → self-repair adapted ${a.toFixed(2)} → ${f.toFixed(2)} ${f>a?'▲':''}`;
+    } else if(MODE==='repair'&&ms.length===2){
+      const a=ms[0].card.reward,f=ms[1].card.reward;
+      s.textContent=f>a?`self-repair: ${a.toFixed(2)} → ${f.toFixed(2)} ▲ the model read its own findings and fixed them`
+                       :`first pass already clean (${a.toFixed(2)}) — nothing to repair`;
+    } else if(ms[0]){
+      const t=ms[0]; let v=`reward ${t.card.reward.toFixed(3)}`;
+      if(t.samples&&t.samples.length>1) v=`pass@1 ${t.samples[0].toFixed(2)} → best-of-${t.samples.length} · ${v}`;
+      if(t.repair) v+=` · self-repair ${t.repair.pass1.toFixed(2)}→${t.repair.final.toFixed(2)}`;
+      s.textContent=v;
+    }
+  }catch(e){s.textContent='request failed: '+e;}
+  b.disabled=false;
+}
+// ── grow the verifier: a big model drafts a rule, gates vet it, it goes live ──
+fetch('/rulespecs').then(r=>r.json()).then(j=>{
+  if(!j.specs||!j.specs.length) return;
+  document.getElementById('growbox').style.display='block';
+  document.getElementById('authmodel').textContent=j.model||'big model';
+  document.getElementById('spec').innerHTML=j.specs.map(s=>
+    `<option value="${s.name}">${s.name} · ${s.severity}${s.live?' · LIVE':''}</option>`).join('');
+}).catch(()=>{});
+function gpill(t,ok){return `<span class="gate ${ok?'gp':'gf'}">${t} ${ok?'✓':'✗'}</span>`;}
+function renderAuth(j){
+  const ok=!!j.accepted;
+  const astPass = j.stage==='validate' || ok;                 // 'compile' stage = AST/compile reject
+  const rep=(j.report||[]).map(l=>{const good=/OK\s*$/.test(l);
+    return `<div class="rule"><span class="${good?'ok':'bad'}">${good?'✓':'✗'}</span> ${esc(l.trim())}</div>`;}).join('');
+  const head = ok
+    ? `<span class="reward" style="color:#4ade80;font-size:17px;">ACCEPT — rule ${j.applied?'is now LIVE':'validated'}</span>`
+    : `<span class="reward" style="color:#f87171;font-size:17px;">REJECT — not merged</span>`;
+  return `<div class="card"><h3>${(j.rule&&j.rule.name)||'rule'}${head}</h3>
+    <div style="font-size:12px;color:#8b93a7;margin:-2px 0 10px;">${esc((j.rule&&j.rule.intent)||'')}</div>
+    <div style="margin-bottom:8px;">${gpill('AST sandbox',astPass)} ${gpill('executable tests ('+(j.n_examples||0)+')',ok)}</div>
+    ${rep}
+    ${j.error?`<div class="rule bad">✗ ${esc(j.error)}</div>`:''}
+    ${j.applied?`<div class="status" style="color:#4ade80;">↑ now enforced — run a generation above to see it judged under the new rule.</div>`:''}
+    <details><summary style="color:#4c6fff;font-size:13px;cursor:pointer;margin-top:6px;">drafted predicate · ${esc(j.model||'')}</summary><pre>${esc(j.src||'')}</pre></details>
+  </div>`;
+}
+async function authorize(){
+  const b=document.getElementById('authbtn'), o=document.getElementById('authout');
+  const name=document.getElementById('spec').value;
+  b.disabled=true; o.innerHTML='<div class="status">drafting predicate + running the gates…</div>';
+  try{
+    const r=await fetch('/authorize-rule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({spec:name})});
+    o.innerHTML=renderAuth(await r.json());
+  }catch(e){o.innerHTML='<div class="rule bad">request failed: '+esc(''+e)+'</div>';}
+  b.disabled=false;
+}
+</script></body></html>
