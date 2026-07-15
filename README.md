@@ -19,6 +19,46 @@ careful about reward hacking.* rl-gym makes the second half first-class: hard ga
 gamed rewards, saturation caps, and an audit (uniq%, per-component breakdown) that shows *how*
 the model improved, not just that a number went up.
 
+## How to use this
+
+rl-gym is a **platform**, not a single model — five ways to use it:
+
+**1 · Retarget it to your own task — the `Environment` SDK.** Implement `episodes / prompt /
+parse / oracle / random` + a program-computable `reward`, `register()` it, and the trainer,
+eval, and audit run unchanged. `iac` (secure Terraform) is the reference instance
+(`rl_gym/iac/env.py`).
+
+**2 · Run the pipeline** (SFT → GRPO → eval → gated promote) as one Nebius Job:
+```bash
+bash scripts/nebius_launch_iac.sh    # + EVAL_ONLY=1 · BAKEOFF=1 · MINE=1 · DISCOVER=1 · WEBDEMO=1 for other modes
+```
+
+**3 · Serve it — HTTP API** (`python -m rl_gym.iac.webdemo`, vLLM; or `webdemo_tf`, Token
+Factory, no GPU):
+```
+POST /generate        {req, required, engines, drift} → secure Terraform + scorecard (reward, per-rule ✓/✗, gates, cost)
+POST /authorize-rule  {spec}   → a big model drafts a scanner rule, gated (AST + tests), goes live
+GET  /rulespecs · /config · /presets       POST /reload
+```
+Deploy in your VPC (self-host vLLM), a managed Nebius container, or Token Factory per-token.
+
+**4 · Use the verifier as a library** — no model needed:
+```python
+from rl_gym.iac.scan import scan              # per-rule verdict + pass_rate on raw HCL
+from rl_gym.gym.core import score_completion   # reward + hard gates
+```
+Drop it in as an RL reward, or as a CI / pre-commit Terraform security check.
+
+**5 · Grow the verifier / run the flywheel:**
+```bash
+python -m scripts.gap_mine   --model <ckpt>       # served traffic × Checkov → coverage gaps
+python -m rl_gym.gym.rulegen --spec <spec.json>   # big model drafts + gates a new rule
+python -m scripts.flywheel_aggregate ...          # pool served logs → retrain candidate → gym.gate PROMOTE/BLOCK
+```
+
+That's the whole machine — **target** your task, **train** it, **serve** it, and let it
+**improve itself**. Deeper walkthroughs: [Demo](#demo) · [Reproduce on Nebius](#reproduce-on-nebius) · [Architecture](#architecture).
+
 ## Headline results (granite-4.1-8b, Nebius H100, N=120, clean disjoint split)
 
 **Base model chosen empirically** — a bake-off mode scored four candidates on the real benchmark
