@@ -16,6 +16,10 @@ This is **rl-gym**: a small, reusable post-training platform that trains open mo
 
 ![The rl-gym flywheel — two loops](figures/architecture.png)
 
+**▶ Watch the 3-minute demo** — secure Terraform generated and scored live, the model repairing its own findings, adapting in-context to a brand-new rule, and a big open model growing the verifier itself:
+
+https://www.youtube.com/watch?v=_IsADe8h4_Q
+
 ## The one idea: the reward is a program
 
 Most of the interesting recent RL work on LLMs — the reasoning models, the math-and-code fine-tunes — rests on a single decision rule: **if the task is verifiable, you can skip the reward model and let a program grade the output.** Exact-match for math. Unit tests for code. That's RLVR — Reinforcement Learning with Verifiable Rewards.
@@ -212,7 +216,7 @@ Because the interesting part of a systems project is the failures you survived:
 
 Every one of these is in the repo with its eval output. The pitch isn't "nothing broke" — it's "everything is measured, and the gates caught what broke."
 
-**Code (AGPL-3.0):** [github.com/SkyForce/rl-gym](https://github.com/SkyForce/rl-gym) — reproduce it on Nebius token-free (instructions in the README). Commercial licenses available.
+**Code (AGPL-3.0):** [github.com/SkyForce/rl-gym](https://github.com/SkyForce/rl-gym) — reproducible on Nebius from the public repo + prebuilt image, no GitHub token needed (runbook in the README). Commercial licenses available.
 
 ---
 
