@@ -127,3 +127,53 @@ Numbers below are the committed ones (README / paper). Say them; don't read them
 | Cost: tuned vs blind frontier | **~$0.006 vs ~$0.17 (28×)** |
 | Continual weight update | **~$1.30**, zero forgetting |
 | Flywheel promotion | real +0.041 · holdout +0.047 → **PROMOTE** (a program decides) |
+
+---
+
+## Caption sheet (no-voice edit) — drop straight into CapCut / iMovie
+
+No narration, so **text carries the story**. Two layers:
+- **[TITLE CARD]** — full-screen (or big centered band), shown **2–3s** at the start of each beat.
+- **‣ lower-third** — one short line at a time over the screen action, held for the seconds in
+  parentheses (long enough to read). Keep them short; text competes with the UI.
+
+**Style:** a clean sans (Inter / SF / Helvetica), white text on a ~70% black rounded band, bottom
+third, safe margin from the edges. One caption on screen at a time. Don't narrate the mouse — the
+caption states the *point*, the screen shows the *action*.
+
+### Intro · 0:00–0:15
+- **[TITLE CARD]** Secure Terraform, from an 8B open model
+- ‣ A security scanner is its reward — and judges every answer live *(4s)*
+- ‣ One browser tab. Every model on screen is the real one. *(3s)*
+
+### Beat 1 · the scanner is the reward · 0:15–0:45
+- **[TITLE CARD]** 1 · The scanner IS the reward
+- ‣ Tuned 8B, running on a Nebius L40S *(3s)*
+- ‣ Every rule ✓/✗, both hard gates — scored live *(4s)*
+- ‣ Verifiably secure, for ~$0.006 *(4s — callout arrow on the cost)*
+
+### Beat 2 · self-repair · 0:45–1:15
+- **[TITLE CARD]** 2 · It repairs its own findings
+- ‣ First pass isn't perfect — it reads the scanner's findings *(4s)*
+- ‣ Rewrites the exact gap → 1.00 *(4s — callout on the ② card)*
+- ‣ Trained repair: 89% converted vs 71% untrained *(4s)*
+
+### Beat 3 · drift · 1:15–1:45  *(first to cut if over time)*
+- **[TITLE CARD]** 3 · The standard drifts — it adapts
+- ‣ 5 new rules take effect in the scanner *(3s)*
+- ‣ Never rewarded on them — it adapts in-context *(4s)*
+- ‣ Baking them into the weights: a separate ~$1.30 step *(3s)*
+
+### Beat 4 · grow the verifier · 1:45–2:40  *(the payoff)*
+- **[TITLE CARD]** 4 · Grow the verifier: mine the gap → draft the rule
+- ‣ The miner runs served traffic through Checkov *(4s)*
+- ‣ Blind spot: our scanner passed a config Checkov CKV_AWS_293 flagged *(4s — on the gap card)*
+- ‣ DeepSeek-V4-Pro drafts the predicate *(3s — speed the ~15s draft to 3–4×)*
+- ‣ AST sandbox ✓ · executable tests ✓ · now LIVE *(4s — on ACCEPT)*
+- ‣ Re-generate → the brand-new rule is judged, and repaired *(4s)*
+
+### Close · 2:40–3:00
+- **[TITLE CARD]** Big model writes rules · verifier judges · small model serves
+- ‣ ~$0.006 vs ~$0.17 for a blind frontier model — 28× cheaper *(4s)*
+- ‣ A gated flywheel turns this traffic into the next model *(4s)*
+- ‣ All open-weight, all serverless on Nebius *(3s)*
