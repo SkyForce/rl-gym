@@ -124,7 +124,8 @@ The loop the platform is built on, run end to end with no human in the decision:
 demo logs every served request (real phrasing) and every self-repair transcript (config +
 findings + outcome) to S3; an aggregator pools that traffic and mixes in replay; a continual
 update trains from the incumbent; and an **executable promotion gate** (`rl_gym/gym/gate.py`)
-evaluates the candidate against the incumbent on the frozen anchors and exits PROMOTE or BLOCK.
+evaluates the candidate against the incumbent on the frozen anchors — eval batched through vLLM
+in one call (`RLGYM_EVAL_VLLM=1`), greedy/seeded so it's reproducible — and exits PROMOTE or BLOCK.
 
 First real cycle (26 pilot requests → 38 logged episodes → 50-step update → gate, ~$4):
 

@@ -126,7 +126,7 @@ Trained repair converts 89% of its attempts on the holdout (17/19) versus 71% un
 
 ## The flywheel: serving traffic becomes the next model, and a *program* decides it ships
 
-This is the loop the whole platform is built to run. The live demo logs every served request and every repair transcript to S3. An aggregator pools that traffic, a continual update trains from the incumbent, and an **executable promotion gate** evaluates the candidate against the incumbent on frozen anchors and exits `PROMOTE` or `BLOCK`. No human in the decision.
+This is the loop the whole platform is built to run. The live demo logs every served request and every repair transcript to S3. An aggregator pools that traffic, a continual update trains from the incumbent, and an **executable promotion gate** evaluates the candidate against the incumbent on the frozen anchors — batched through vLLM in one call, greedy/seeded so the decision is reproducible — and exits `PROMOTE` or `BLOCK`. No human in the decision.
 
 First real cycle — 26 pilot requests → 38 logged episodes → a 50-step update → the gate, about $4:
 
