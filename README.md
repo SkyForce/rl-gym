@@ -214,7 +214,10 @@ external/closed model anywhere.
 - **Serving the 8B** (`rl_gym.iac.webdemo` — vLLM): the promoted `iac-grpo-fw1` on a **Nebius
   L40S** at ~$0.006/request amortized, on a managed Nebius container, or self-hosted in-VPC.
   Token-Factory per-token serving (`tf_policy`) is available only if you fine-tune a supported
-  base (Llama-3.1-8B / Qwen2.5).
+  base (Llama-3.1-8B / Qwen2.5). The engine boots the fastest config the hardware accepts —
+  **fp8 weights** (the L40S is bandwidth-bound; Ada has native fp8 kernels), **prompt-lookup
+  speculative decoding** (Terraform is templated, so drafts verify losslessly), and **CUDA
+  graphs** — degrading one knob at a time on OOM. That's what makes the ~$0.006 real.
 - **Growing the verifier** (`rl_gym.gym.rulegen`): new rules are *mined*, not guessed — served
   logs cross-checked against external scanners (Checkov & friends) surface the gaps, and each
   gap is a candidate rule. A big open reasoning model (`deepseek-ai/DeepSeek-V4-Pro` — per-token,
