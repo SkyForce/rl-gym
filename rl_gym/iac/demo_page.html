@@ -28,7 +28,8 @@ pre{background:#10131b;border-radius:8px;padding:13px;font-size:14px;line-height
 .legend{font-size:13px;color:#9aa3b4;margin:8px 0 0;}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin:0 4px 0 10px;}
 .hint{color:#9aa3b4;font-size:14px;line-height:1.5;margin-top:8px;}
-.status{color:#c2c9d6;font-size:16px;margin-top:12px;}
+.status{color:#eef1f6;font-size:18.5px;line-height:1.45;margin-top:16px;min-height:1.5em;font-weight:500;}
+.status b{color:#8fa2ff;font-weight:600;} .status .g{color:#4ade80;} .status .y{color:#fbbf24;} .status .r{color:#f87171;} .status .m{color:#9aa3b4;font-weight:400;}
 .chip{cursor:pointer;display:inline-block;background:#181c26;border:1px solid #2a3040;border-radius:14px;padding:6px 13px;font-size:14.5px;color:#c2c9d6;margin:0 6px 7px 0;}
 select{background:#1c2130;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:9px 36px 9px 13px;font-size:14.5px;font-family:ui-monospace,monospace;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b93a7' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;}
 select:hover{border-color:#3d4658;background-color:#20263a;}
@@ -38,10 +39,10 @@ option{background:#1c2130;color:#e6e6e6;}
 <h1>rl-gym — secure Terraform, live</h1>
 <p class="sub">An 8B open model, GRPO-tuned against a security scanner that judges every answer live — and trained to repair its own findings. Type an infra request.</p>
 <div>
-<span class="chip" onclick="fill('an S3 bucket for customer invoices with KMS encryption, versioning, and no public access','aws_s3_bucket')">invoice bucket</span>
-<span class="chip" onclick="fill('a PostgreSQL RDS instance for the billing service, not publicly accessible, encrypted, 7-day backups','aws_db_instance')">billing RDS</span>
-<span class="chip" onclick="fill('an EC2 web server; HTTPS from anywhere, SSH only from 10.0.0.0/8, encrypted root volume, IMDSv2','aws_instance,aws_security_group')">web server</span>
-<span class="chip" onclick="fill('a Lambda function processing uploads with a CloudWatch log group with 30-day retention','aws_lambda_function,aws_cloudwatch_log_group')">lambda + logs</span>
+<span class="chip" onclick="fill('an S3 bucket for customer invoices with KMS encryption, versioning, and no public access','aws_s3_bucket','▸ Request: a secure S3 bucket for invoices. Hit <b>Generate</b> — the scanner scores every rule live.')">invoice bucket</span>
+<span class="chip" onclick="fill('a PostgreSQL RDS instance for the billing service, not publicly accessible, encrypted, 7-day backups','aws_db_instance','▸ Request: a locked-down PostgreSQL RDS. Hit <b>Generate</b>.')">billing RDS</span>
+<span class="chip" onclick="fill('an EC2 web server; HTTPS from anywhere, SSH only from 10.0.0.0/8, encrypted root volume, IMDSv2','aws_instance,aws_security_group','▸ Request: a hardened EC2 web server. Hit <b>Generate</b> — watch self-repair if the first pass slips.')">web server</span>
+<span class="chip" onclick="fill('a Lambda function processing uploads with a CloudWatch log group with 30-day retention','aws_lambda_function,aws_cloudwatch_log_group','▸ Request: a Lambda + log group with 30-day retention. Hit <b>Generate</b>.')">lambda + logs</span>
 </div>
 <div id="presets"></div>
 <div id="driftbox" style="display:none;margin:8px 0 0;">
@@ -66,7 +67,8 @@ option{background:#1c2130;color:#e6e6e6;}
 </div>
 </div>
 <script>
-function fill(r,t){document.getElementById('req').value=r;document.getElementById('required').value=t;}
+function cap(h){document.getElementById('status').innerHTML=h;}
+function fill(r,t,c){document.getElementById('req').value=r;document.getElementById('required').value=t;if(c!=null)cap(c);}
 let DRIFT_SET=new Set();
 fetch('/config').then(r=>r.json()).then(j=>{
   DRIFT_SET=new Set(j.drift_rules||[]);
@@ -75,9 +77,9 @@ fetch('/config').then(r=>r.json()).then(j=>{
 // curated showcase — best-of-4 (the real product; robust to per-sample noise)
 let MODE=null;   // {clean|policy} — set on chip click, cleared when you type
 const CURATED={
-  7:{tag:'clean 1.0',mode:'clean',note:'verifier-selected best of 4 — a perfect secure config',col:'#0F6E56'},
-  3:{tag:'self-repair',mode:'repair',note:'first attempt misses VPC flow logs → the model reads the finding and adds them → 1.00',col:'#5C4EE5'},
-  8:{tag:'new rule → instant adapt',mode:'policy',note:'the SCANNER gains a new rule (EBS-optimized); the SAME model adapts in-context via self-repair — no retraining → 1.00',col:'#854F0B'},
+  7:{tag:'clean 1.0',mode:'clean',note:'A clean, secure config — every scanner rule green on the first pass.',col:'#0F6E56'},
+  3:{tag:'self-repair',mode:'repair',note:'Self-repair — the first attempt misses a rule, the model reads its own scanner finding and rewrites it → <b class="g">1.00</b>.',col:'#5C4EE5'},
+  8:{tag:'new rule → instant adapt',mode:'policy',note:'Policy update — the scanner gains <b>5 new rules</b> the model was never trained on. Watch it adapt in-context via self-repair.',col:'#854F0B'},
 };
 fetch('/presets').then(r=>r.json()).then(j=>{
   if(!j.presets||!j.presets.length) return;
@@ -88,11 +90,11 @@ fetch('/presets').then(r=>r.json()).then(j=>{
     const el=document.createElement('span'); el.className='chip';
     el.style.borderColor=c.col;
     el.innerHTML=`<b style="color:${c.col}">${c.tag}</b> · ${p.req.length>28?p.req.slice(0,28)+'…':p.req}`;
-    el.title=c.note+'  —  '+p.req;
+    el.title=p.req;
     el.onclick=()=>{
       fill(p.req,(p.required||[]).join(',')); MODE=c.mode;
       const dr=document.getElementById('drift'); if(dr) dr.checked=(c.mode==='policy');
-      document.getElementById('status').textContent='▸ '+c.note;
+      cap('▸ '+c.note);
     };
     w.appendChild(el);
   });
@@ -167,16 +169,18 @@ async function run(){
     if(MODE==='policy'&&ms.length===2){
       const a=ms[0].card.reward,f=ms[1].card.reward;
       const nf=(ms[0].card.rules||[]).filter(r=>!r.ok&&DRIFT_SET.has(r.name)).map(r=>r.name);
-      s.textContent=`policy update · ${nf.length?('NEW rule '+nf[0]+' failed'):'new rules in effect'} → self-repair adapted ${a.toFixed(2)} → ${f.toFixed(2)} ${f>a?'▲':''}`;
+      cap(`Policy changed — the model ${nf.length?('failed the new rule <b>'+esc(nf[0])+'</b>'):'hit the new rules'} on the first pass (<b class="y">${a.toFixed(2)}</b>), then <b>self-repaired</b> to satisfy it → <b class="g">${f.toFixed(2)}</b>. Adapted in-context, no retraining.`);
     } else if(MODE==='repair'&&ms.length===2){
       const a=ms[0].card.reward,f=ms[1].card.reward;
-      s.textContent=f>a?`self-repair: ${a.toFixed(2)} → ${f.toFixed(2)} ▲ the model read its own findings and fixed them`
-                       :`first pass already clean (${a.toFixed(2)}) — nothing to repair`;
+      cap(f>a?`Self-repair — first pass <b class="y">${a.toFixed(2)}</b>, the model read the scanner's own findings and rewrote the gap → <b class="g">${f.toFixed(2)}</b> ▲`
+             :`First pass already clean (<b class="g">${a.toFixed(2)}</b>) — nothing to repair.`);
     } else if(ms[0]){
-      const t=ms[0]; let v=`reward ${t.card.reward.toFixed(3)}`;
-      if(t.samples&&t.samples.length>1) v=`pass@1 ${t.samples[0].toFixed(2)} → best-of-${t.samples.length} · ${v}`;
-      if(t.repair) v+=` · self-repair ${t.repair.pass1.toFixed(2)}→${t.repair.final.toFixed(2)}`;
-      s.textContent=v;
+      const t=ms[0], rw=t.card.reward;
+      let v=rw>=0.999?`<b class="g">Reward ${rw.toFixed(3)}</b> — a verifiably secure config; every rule and both gates pass.`
+                     :`Reward <b class="${rw>=0.8?'g':'y'}">${rw.toFixed(3)}</b> — the scanner flagged gaps.`;
+      if(t.repair) v+=` <span class="m">(self-repair ${t.repair.pass1.toFixed(2)}→${t.repair.final.toFixed(2)})</span>`;
+      if(t.cost_usd!=null) v+=` <span class="m">· ~$${t.cost_usd.toFixed(3)}</span>`;
+      cap(v);
     }
   }catch(e){s.textContent='request failed: '+e;}
   b.disabled=false;
@@ -218,14 +222,14 @@ function renderAuth(j){
     <div style="margin-bottom:8px;">${gpill('AST sandbox',astPass)} ${gpill('executable tests ('+(j.n_examples||0)+')',ok)}</div>
     ${rep}
     ${j.error?`<div class="rule bad">✗ ${esc(j.error)}</div>`:''}
-    ${j.applied?`<div class="status" style="color:#4ade80;">↑ now enforced — run a generation above to see it judged under the new rule.</div>`:''}
+    ${j.applied?`<div class="status" style="color:#4ade80;font-size:16px;">↑ Drafted by ${esc(j.model||'the big model')} · AST sandbox + tests passed · <b style="color:#4ade80">now LIVE</b> — run a generation above to see it judged under the new rule.</div>`:''}
     <details><summary style="color:#4c6fff;font-size:14.5px;cursor:pointer;margin-top:6px;">drafted predicate · ${esc(j.model||'')}</summary><pre>${esc(j.src||'')}</pre></details>
   </div>`;
 }
 async function authorize(){
   const b=document.getElementById('authbtn'), o=document.getElementById('authout');
   const name=document.getElementById('spec').value;
-  b.disabled=true; o.innerHTML='<div class="status">drafting predicate + running the gates…</div>';
+  b.disabled=true; o.innerHTML='<div class="status" style="font-size:16px;">The big model is drafting a scanner predicate — then the AST sandbox + executable tests vet it…</div>';
   try{
     const r=await fetch('/authorize-rule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({spec:name})});
     o.innerHTML=renderAuth(await r.json());
