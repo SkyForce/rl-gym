@@ -92,10 +92,10 @@ act "ACT 3 · The whole loop, LIVE on Nebius Token Factory (open weights, no GPU
 if [ -z "${TOKEN_FACTORY_API_KEY:-}" ]; then
   printf "${Y}  TOKEN_FACTORY_API_KEY not set — skipping the live act.${X}\n"
   say "To run it live:  export TOKEN_FACTORY_API_KEY=...  then re-run this script."
-  say "It runs: 235B writes Terraform → verifier judges → self-repair fixes →"
-  say "235B AUTHORS a new rule (gated) → distillation punchline. ~30s, a few cents."
+  say "It runs: a big open model writes Terraform → verifier judges → self-repair fixes →"
+  say "the big model AUTHORS a new rule (gated) → distillation punchline. ~30s, a few cents."
 else
-  say "A 235B open model writes Terraform, the verifier judges it, the model repairs"
+  say "A big open model (DeepSeek-V4-Pro) writes Terraform, the verifier judges it, the model repairs"
   say "its own findings, then AUTHORS a new gated rule — all serverless, live."
   pause
   $PY scripts/demo_e2e.py --model deepseek-ai/DeepSeek-V4-Pro \

@@ -1,0 +1,20 @@
+{
+  "name": "cloudtrail_multi_region",
+  "severity": "medium",
+  "intent": "An aws_cloudtrail should set is_multi_region_trail = true.",
+  "hint": "set is_multi_region_trail = true on the aws_cloudtrail",
+  "pass_examples": [
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n  is_multi_region_trail = true\n}",
+    "resource \"aws_vpc\" \"v\" { cidr_block = \"10.0.0.0/16\" }",
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n  event_selector { read_write_type = \"All\" }\n  is_multi_region_trail = true\n}"
+  ],
+  "fail_examples": [
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n}",
+    "resource \"aws_cloudtrail\" \"u\" {\n  name = \"u\"\n  s3_bucket_name = \"b\"\n  is_multi_region_trail = false\n}",
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n  event_selector { read_write_type = \"All\" }\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "logging",
+  "_maps_to": "CKV_AWS_67"
+}

@@ -73,7 +73,7 @@ def main():
     print(f"\n{C['b']}request:{C['x']} {ep['req']}")
 
     # ── Act 1: big model generates, verifier judges ────────────────────────────────
-    hr("ACT 1 · a 235B model writes Terraform — the verifier judges it")
+    hr("ACT 1 · a big open model writes Terraform — the verifier judges it")
     gen = tf.chat(args.model, [{"role": "user", "content": env.prompt(ep)}],
                   temperature=0.2, max_tokens=1800)
     rb1, hcl1, fails1 = scorecard(env, gen, ep, scan_mod)
@@ -84,7 +84,7 @@ def main():
     print(f"  {C['dim']}→ even a big model leaves {verdict}. The verifier is the ground truth.{C['x']}")
 
     # ── Act 2: hand the findings back — a generic model is an inconsistent fixer ────
-    hr("ACT 2 · hand the audit back — even a 235B is an inconsistent security fixer")
+    hr("ACT 2 · hand the audit back — even a big model is an inconsistent security fixer")
     findings = findings_text(hcl1, ep)
     print(f"  {C['dim']}scanner findings handed back:{C['x']}")
     for line in findings.splitlines()[:6]:
@@ -99,7 +99,7 @@ def main():
                  "hcl": env.parse(served_txt, ep) or ""}
     fixed = len(fails1) - len(fails2)
     note = (f"cleared {fixed} finding(s) here" if fixed > 0 else "made no progress here")
-    print(f"  {C['dim']}→ {len(fails1)}→{len(fails2)} findings, {note}. But across requests the 235B is")
+    print(f"  {C['dim']}→ {len(fails1)}→{len(fails2)} findings, {note}. But across requests the big model is")
     print(f"  inconsistent (it clears a simple flow-log yet stalls on IAM-wildcard criticals) and costs")
     print(f"  ~25× more per call — which is why secure generation is DISTILLED into a tuned model.{C['x']}")
 
@@ -128,11 +128,11 @@ def main():
         T["act3"]["rejudge"] = {"reward": rb3.reward, "flags_new_rule": bool(newly)}
 
     # ── Act 4: the distilled specialist beats the rented giant ─────────────────────
-    hr("ACT 4 · the tuned 8B does what the 235B couldn't — reliably, for $0.006")
+    hr("ACT 4 · the tuned 8B does what the big model couldn't — reliably, for $0.006")
     print(f"  Our verifier-trained 8B, on the SAME benchmark: real IaC-Eval {C['ok']}0.865{C['x']}, "
           f"holdout {C['ok']}0.963{C['x']},")
     print(f"  repair converts {C['ok']}89%{C['x']} of attempts — {C['b']}consistently{C['x']}, where the "
-          f"235B is hit-or-miss.")
+          f"the big model is hit-or-miss.")
     print(f"  Cost: {C['b']}~$0.006/request{C['x']} in-VPC vs a big model's ~$0.16. And a {C['b']}flywheel{C['x']}")
     print(f"  promotes a better model from its own traffic — gate-checked, ~$4/cycle.")
     print(f"\n  {C['b']}The division of labor this demo just showed, live:{C['x']}")

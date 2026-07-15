@@ -74,7 +74,7 @@ WEBDEMO=1 WEBDEMO_DRIFT=1 GH_PAT=ghp_...  bash scripts/nebius_launch_iac.sh
 ### Beat 5 — Growing the verifier itself, with a big model  · *Interface B (then C)*
 - **Do:** open the **hosted console** and walk its four acts; then, for the skeptic, run it *live*
   on your laptop: `TOKEN_FACTORY_API_KEY=... python scripts/demo_e2e.py --episode 3`.
-- **See:** a 235B open model writes Terraform → the verifier judges it → the model repairs it →
+- **See:** a big open model (DeepSeek-V4-Pro) writes Terraform → the verifier judges it → the model repairs it →
   **the big model authors a brand-new scanner rule**, which passes an AST sandbox and every
   executable test and goes live. (In Interface C you can also show the gates *rejecting* a lazy
   always-`pass` rule and a malicious `import os` rule — `scripts/live_demo.sh` Act 2.)

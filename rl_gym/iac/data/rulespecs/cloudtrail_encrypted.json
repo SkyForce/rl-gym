@@ -1,0 +1,20 @@
+{
+  "name": "cloudtrail_encrypted",
+  "severity": "high",
+  "intent": "An aws_cloudtrail must set kms_key_id (log files encrypted with a KMS CMK).",
+  "hint": "set kms_key_id on the aws_cloudtrail",
+  "pass_examples": [
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n  kms_key_id = \"arn:aws:kms:...:key/1\"\n}",
+    "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }",
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n  event_selector { read_write_type = \"All\" include_management_events = true }\n  kms_key_id = \"arn:aws:kms:...:key/1\"\n}"
+  ],
+  "fail_examples": [
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n}",
+    "resource \"aws_cloudtrail\" \"u\" {\n  name = \"u\"\n  s3_bucket_name = \"b\"\n  is_multi_region_trail = true\n}",
+    "resource \"aws_cloudtrail\" \"t\" {\n  name = \"t\"\n  s3_bucket_name = \"b\"\n  event_selector { read_write_type = \"All\" }\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "logging",
+  "_maps_to": "CKV_AWS_35"
+}

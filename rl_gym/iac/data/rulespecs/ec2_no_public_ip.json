@@ -1,0 +1,20 @@
+{
+  "name": "ec2_no_public_ip",
+  "severity": "medium",
+  "intent": "An aws_instance must not set associate_public_ip_address = true (no direct public exposure).",
+  "hint": "remove associate_public_ip_address = true; place the instance behind a NAT/ALB",
+  "pass_examples": [
+    "resource \"aws_instance\" \"web\" {\n  ami = \"ami-1\"\n  instance_type = \"t3.micro\"\n  associate_public_ip_address = false\n}",
+    "resource \"aws_db_instance\" \"d\" { engine = \"postgres\" }",
+    "resource \"aws_instance\" \"w\" {\n  ami = \"ami-1\"\n  root_block_device { encrypted = true }\n  associate_public_ip_address = false\n}"
+  ],
+  "fail_examples": [
+    "resource \"aws_instance\" \"web\" {\n  ami = \"ami-1\"\n  instance_type = \"t3.micro\"\n  associate_public_ip_address = true\n}",
+    "resource \"aws_instance\" \"w2\" {\n  ami = \"ami-2\"\n  associate_public_ip_address = true\n}",
+    "resource \"aws_instance\" \"w\" {\n  ami = \"ami-1\"\n  root_block_device { encrypted = true }\n  associate_public_ip_address = true\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "network",
+  "_maps_to": "CKV_AWS_88"
+}

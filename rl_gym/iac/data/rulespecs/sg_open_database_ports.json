@@ -1,0 +1,18 @@
+{
+  "name": "sg_open_database_ports",
+  "severity": "critical",
+  "intent": "A security group ingress must not open a database port (3306, 5432, 6379, 27017, 1433, 5439) to 0.0.0.0/0.",
+  "hint": "remove 0.0.0.0/0 ingress on the database port; restrict to a private CIDR",
+  "pass_examples": [
+    "resource \"aws_security_group\" \"db\" {\n  ingress { from_port = 5432 to_port = 5432 protocol = \"tcp\" cidr_blocks = [\"10.0.0.0/8\"] }\n}",
+    "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }"
+  ],
+  "fail_examples": [
+    "resource \"aws_security_group\" \"db\" {\n  ingress { from_port = 3306 to_port = 3306 protocol = \"tcp\" cidr_blocks = [\"0.0.0.0/0\"] }\n}",
+    "resource \"aws_security_group\" \"r\" {\n  ingress { from_port = 6379 to_port = 6379 protocol = \"tcp\" cidr_blocks = [\"0.0.0.0/0\"] }\n}"
+  ],
+  "_tier": "per_resource",
+  "_serve": "reward",
+  "_category": "network",
+  "_maps_to": "CIS 4.x / Checkov SG family"
+}

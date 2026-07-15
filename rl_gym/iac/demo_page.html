@@ -4,35 +4,35 @@
 <style>
 body{font-family:-apple-system,Segoe UI,sans-serif;background:#0f1117;color:#e6e6e6;margin:0;padding:32px 16px;}
 .wrap{max-width:1060px;margin:0 auto;}
-h1{font-size:20px;font-weight:600;margin:0 0 4px;} .sub{color:#8b93a7;font-size:14px;margin:0 0 24px;}
-textarea{width:100%;box-sizing:border-box;background:#181c26;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:12px;font-size:15px;min-height:70px;resize:vertical;}
-input{width:100%;box-sizing:border-box;background:#181c26;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:10px 12px;font-size:13px;font-family:ui-monospace,monospace;}
-button{background:#4c6fff;color:#fff;border:0;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px;}
+h1{font-size:24px;font-weight:600;margin:0 0 6px;} .sub{color:#9aa3b4;font-size:16.5px;line-height:1.5;margin:0 0 22px;}
+textarea{width:100%;box-sizing:border-box;background:#181c26;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:12px;font-size:16px;min-height:70px;resize:vertical;}
+input{width:100%;box-sizing:border-box;background:#181c26;color:#e6e6e6;border:1px solid #2a3040;border-radius:10px;padding:10px 12px;font-size:15px;font-family:ui-monospace,monospace;}
+button{background:#4c6fff;color:#fff;border:0;border-radius:10px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer;margin-top:12px;}
 button:disabled{opacity:.5;cursor:wait;}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:24px;}
 .card{background:#161a24;border:1px solid #262c3a;border-radius:14px;padding:18px;}
-.card h3{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:baseline;}
-.reward{font-size:24px;font-weight:700;}
-.rule{display:flex;gap:8px;font-size:13px;font-family:ui-monospace,monospace;padding:2px 0;align-items:center;}
-.sev{margin-left:auto;font-size:11px;color:#8b93a7;}
+.card h3{margin:0 0 10px;font-size:17px;display:flex;justify-content:space-between;align-items:baseline;}
+.reward{font-size:26px;font-weight:700;}
+.rule{display:flex;gap:8px;font-size:14.5px;font-family:ui-monospace,monospace;padding:3px 0;align-items:center;}
+.sev{margin-left:auto;font-size:13px;color:#9aa3b4;}
 .ok{color:#4ade80;} .bad{color:#f87171;} .warn{color:#fbbf24;}
-.bar{height:6px;background:#262c3a;border-radius:3px;margin:10px 0;overflow:hidden;}
+.bar{height:7px;background:#262c3a;border-radius:3px;margin:11px 0;overflow:hidden;}
 .bar>div{height:100%;}
-.gate{display:inline-block;font-size:12px;padding:3px 10px;border-radius:12px;margin:2px 4px 2px 0;}
+.gate{display:inline-block;font-size:14px;padding:4px 12px;border-radius:12px;margin:2px 4px 2px 0;}
 .gp{background:#12351f;color:#4ade80;} .gf{background:#3a1418;color:#f87171;}
-pre{background:#10131b;border-radius:8px;padding:12px;font-size:11.5px;line-height:1.5;overflow-x:auto;max-height:340px;color:#c9d1e3;}
+pre{background:#10131b;border-radius:8px;padding:13px;font-size:14px;line-height:1.55;overflow-x:auto;max-height:360px;color:#c9d1e3;}
 .l{display:block;white-space:pre;}
 .l.sg{background:rgba(74,222,128,.10);}
 .l.sb{background:rgba(248,113,113,.16);}
 .chk{color:#22c55e;font-weight:700;} .nochk{color:transparent;}
-.legend{font-size:11px;color:#667;margin:6px 0 0;}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin:0 4px 0 10px;}
-.hint{color:#667;font-size:12px;margin-top:6px;}
-.status{color:#8b93a7;font-size:14px;margin-top:12px;}
-.chip{cursor:pointer;display:inline-block;background:#181c26;border:1px solid #2a3040;border-radius:14px;padding:5px 12px;font-size:12.5px;color:#aeb6c8;margin:0 6px 6px 0;}
+.legend{font-size:13px;color:#9aa3b4;margin:8px 0 0;}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin:0 4px 0 10px;}
+.hint{color:#9aa3b4;font-size:14px;line-height:1.5;margin-top:8px;}
+.status{color:#c2c9d6;font-size:16px;margin-top:12px;}
+.chip{cursor:pointer;display:inline-block;background:#181c26;border:1px solid #2a3040;border-radius:14px;padding:6px 13px;font-size:14.5px;color:#c2c9d6;margin:0 6px 7px 0;}
 </style></head><body><div class="wrap">
 <h1>rl-gym — secure Terraform, live</h1>
-<p class="sub">Secure Terraform from an 8B open model, GRPO-tuned against a security scanner (verifiable reward + hard gates) and trained to repair its own findings. Type an infra request; the scanner judges every answer.</p>
+<p class="sub">An 8B open model, GRPO-tuned against a security scanner that judges every answer live — and trained to repair its own findings. Type an infra request.</p>
 <div>
 <span class="chip" onclick="fill('an S3 bucket for customer invoices with KMS encryption, versioning, and no public access','aws_s3_bucket')">invoice bucket</span>
 <span class="chip" onclick="fill('a PostgreSQL RDS instance for the billing service, not publicly accessible, encrypted, 7-day backups','aws_db_instance')">billing RDS</span>
@@ -43,20 +43,21 @@ pre{background:#10131b;border-radius:8px;padding:12px;font-size:11.5px;line-heig
 <div id="driftbox" style="display:none;margin:8px 0 0;">
   <label class="chip" style="user-select:none;border-color:#7a5c17;color:#fbbf24;">
     <input type="checkbox" id="drift" style="width:auto;margin-right:6px;vertical-align:-2px;">
-    simulate a policy update — <b>5 new rules</b> take effect in the scanner; the same model (not retrained) adapts in-context via self-repair. The weights-level continual update is a separate ~$1.30 offline step.
+    policy update — <b>5 new rules</b> hit the scanner; the same model (not retrained) adapts in-context via self-repair. Baking them into the weights is a separate ~$1.30 step.
   </label>
 </div>
 <textarea id="req" placeholder="Describe the infrastructure you need...">an S3 bucket for customer invoices with KMS encryption, versioning, and no public access</textarea>
 <input id="required" placeholder="required resource types, comma-separated (drives the builds_required gate)" value="aws_s3_bucket">
-<div class="hint">the full system on every request: RL-tuned model → scanner best-of-4 → self-repair (the model reads its own findings and rewrites; the verifier ships the better pass) · flip the policy-update toggle to watch a continual update absorb 5 brand-new rules · base-model and frontier-API comparisons: see the presentation (measured at N=120)</div>
+<div class="hint">every request: tuned model → scanner → self-repair (reads its own findings, ships the better pass). Base + frontier comparisons are in the talk (N=120).</div>
 <button id="go" onclick="run()">Generate + scan</button>
 <div class="status" id="status"></div>
 <div class="grid" id="out"></div>
 <div id="growbox" style="display:none;margin-top:30px;border-top:1px solid #262c3a;padding-top:22px;">
-  <h1 style="font-size:16px;">grow the verifier — a big model authors a new rule</h1>
-  <p class="sub" style="margin:0 0 12px;">A big open model (<span id="authmodel">…</span>) drafts a scanner predicate from a policy spec; an <b>AST sandbox</b> and <b>executable tests</b> vet it before it goes live. The generator is fungible because the artifact is verified — a big LLM writes verifiers, it never gets to be one.</p>
+  <h1 style="font-size:19px;">grow the verifier — mine the gaps, a big model drafts the rule</h1>
+  <p class="sub" style="margin:0 0 12px;">The miner runs served traffic through <b>Checkov</b> and finds configs our scanner <b>passed</b> that Checkov <b>failed</b> — the blind spots. A big open model (<span id="authmodel">…</span>) drafts a predicate to close one; an <b>AST sandbox</b> + <b>executable tests</b> vet it before it ships. A big model writes verifiers; it never gets to be one.</p>
+  <div id="gapbox" style="margin:0 0 12px;"></div>
   <select id="spec" style="width:auto;min-width:280px;display:inline-block;margin-right:8px;"></select>
-  <button id="authbtn" onclick="authorize()" style="margin-top:0;padding:10px 20px;font-size:14px;vertical-align:middle;">Author rule with big model</button>
+  <button id="authbtn" onclick="authorize()" style="margin-top:0;padding:11px 22px;font-size:15px;vertical-align:middle;">Draft the rule with the big model</button>
   <div id="authout" style="margin-top:14px;"></div>
 </div>
 </div>
@@ -111,7 +112,7 @@ function hlHcl(text, otherText){
 function card(m, union, other){
   const mine={}; m.card.rules.forEach(r=>mine[r.name]=r);
   const list=(union&&union.length)?union:m.card.rules.map(r=>[r.name,r.sev]);
-  const badge=(n)=>DRIFT_SET.has(n)?' <b style="color:#fbbf24;font-size:10px;">NEW</b>':'';
+  const badge=(n)=>DRIFT_SET.has(n)?' <b style="color:#fbbf24;font-size:12px;">NEW</b>':'';
   const rules=list.map(([n,sev])=>{
     const r=mine[n];
     if(!r) return `<div class="rule" style="opacity:.42"><span>·</span> ${n}${badge(n)}<span class="sev">not triggered — resource absent</span></div>`;
@@ -123,17 +124,17 @@ function card(m, union, other){
   let samp='';
   if(m.samples&&m.samples.length>1){
     const first=m.samples[0], n=m.samples.length;
-    samp=`<div style="font-size:11.5px;color:#8b93a7;margin:-4px 0 8px;">pass@1 <b style="color:${first>=0.8?'#4ade80':(first>0?'#fbbf24':'#f87171')}">${first.toFixed(2)}</b> → best of ${n} <b>${m.card.reward.toFixed(2)}</b><span style="color:#556"> · draws ${m.samples.map(x=>x.toFixed(2)).join(' ')}</span></div>`;
+    samp=`<div style="font-size:13.5px;color:#9aa3b4;margin:-4px 0 8px;">pass@1 <b style="color:${first>=0.8?'#4ade80':(first>0?'#fbbf24':'#f87171')}">${first.toFixed(2)}</b> → best of ${n} <b>${m.card.reward.toFixed(2)}</b><span style="color:#6b7280"> · draws ${m.samples.map(x=>x.toFixed(2)).join(' ')}</span></div>`;
   }
   if(m.repair){
-    samp+=`<div style="font-size:11.5px;color:#8b93a7;margin:-2px 0 8px;">self-repair: ${m.repair.pass1.toFixed(2)} → <b style="color:${m.repair.final>=0.8?'#4ade80':'#fbbf24'}">${m.repair.final.toFixed(2)}</b>${m.repair.improved?' ▲ (model fixed its own findings)':' (kept first pass)'}</div>`;
+    samp+=`<div style="font-size:13.5px;color:#9aa3b4;margin:-2px 0 8px;">self-repair: ${m.repair.pass1.toFixed(2)} → <b style="color:${m.repair.final>=0.8?'#4ade80':'#fbbf24'}">${m.repair.final.toFixed(2)}</b>${m.repair.improved?' ▲ (fixed its own findings)':' (kept first pass)'}</div>`;
   }
   return `<div class="card"><h3>${m.name}<span class="reward" style="color:${col}">${m.card.reward.toFixed(3)}</span></h3>${samp}
     ${m.card.valid?rules:'<div class="rule bad">✗ malformed output (no resources parsed)</div>'}
     <div class="bar"><div style="width:${p}%;background:${col}"></div></div>
     <div>${gates}</div>
-    <div style="font-size:12px;color:#8b93a7;margin:8px 0 0;" title="${esc(m.cost_note||'')}">cost <b style="color:#e6e6e6">$${(m.cost_usd||0).toFixed(3)}</b>${m.secs!=null?` · ${m.secs.toFixed(1)}s`:' · recorded'}</div>
-    <details><summary style="color:#4c6fff;font-size:13px;cursor:pointer;margin-top:4px;">Terraform</summary>
+    <div style="font-size:13.5px;color:#9aa3b4;margin:8px 0 0;" title="${esc(m.cost_note||'')}">cost <b style="color:#e6e6e6">$${(m.cost_usd||0).toFixed(3)}</b>${m.secs!=null?` · ${m.secs.toFixed(1)}s`:' · recorded'}</div>
+    <details><summary style="color:#4c6fff;font-size:14.5px;cursor:pointer;margin-top:6px;">Terraform</summary>
       <div class="legend"><i style="background:rgba(74,222,128,.45)"></i>hardening <i style="background:rgba(248,113,113,.5)"></i>risky <span class="chk" style="margin-left:10px">✓</span> added / only here</div>
       <pre>${hlHcl(m.card.hcl, other&&other.card?other.card.hcl:'')}</pre></details>
   </div>`;
@@ -179,12 +180,27 @@ async function run(){
   b.disabled=false;
 }
 // ── grow the verifier: a big model drafts a rule, gates vet it, it goes live ──
+let SPECS={};
+function renderGap(s){
+  const g=document.getElementById('gapbox'); if(!g) return;
+  if(!s){g.innerHTML='';return;}
+  const chk=s.maps_to?`Checkov <b>${esc(s.maps_to)}</b>`:'an external Checkov policy';
+  const live=s.live?' <b style="color:#4ade80;font-size:13px;">already live</b>':'';
+  const gap=s.gap?`<details${s.live?'':' open'}><summary style="color:#4c6fff;font-size:14px;cursor:pointer;">the mined gap · a config our scanner passes${live}</summary><pre style="max-height:190px;margin-top:8px;">${esc(s.gap)}</pre></details>`:'';
+  g.innerHTML=`<div class="rule" style="opacity:.95;align-items:flex-start;">
+      <span class="bad" style="margin-top:2px;">✗</span>
+      <span>blind spot — our scanner <b class="ok">passed</b> a config ${chk} <b class="bad">flagged</b>. The big model drafts a predicate to close it.</span></div>${gap}`;
+}
 fetch('/rulespecs').then(r=>r.json()).then(j=>{
   if(!j.specs||!j.specs.length) return;
   document.getElementById('growbox').style.display='block';
   document.getElementById('authmodel').textContent=j.model||'big model';
+  j.specs.forEach(s=>SPECS[s.name]=s);
   document.getElementById('spec').innerHTML=j.specs.map(s=>
     `<option value="${s.name}">${s.name} · ${s.severity}${s.live?' · LIVE':''}</option>`).join('');
+  const sel=document.getElementById('spec');
+  sel.addEventListener('change',()=>renderGap(SPECS[sel.value]));
+  renderGap(SPECS[sel.value]);
 }).catch(()=>{});
 function gpill(t,ok){return `<span class="gate ${ok?'gp':'gf'}">${t} ${ok?'✓':'✗'}</span>`;}
 function renderAuth(j){
@@ -196,12 +212,12 @@ function renderAuth(j){
     ? `<span class="reward" style="color:#4ade80;font-size:17px;">ACCEPT — rule ${j.applied?'is now LIVE':'validated'}</span>`
     : `<span class="reward" style="color:#f87171;font-size:17px;">REJECT — not merged</span>`;
   return `<div class="card"><h3>${(j.rule&&j.rule.name)||'rule'}${head}</h3>
-    <div style="font-size:12px;color:#8b93a7;margin:-2px 0 10px;">${esc((j.rule&&j.rule.intent)||'')}</div>
+    <div style="font-size:13.5px;color:#9aa3b4;margin:-2px 0 10px;line-height:1.45;">${esc((j.rule&&j.rule.intent)||'')}</div>
     <div style="margin-bottom:8px;">${gpill('AST sandbox',astPass)} ${gpill('executable tests ('+(j.n_examples||0)+')',ok)}</div>
     ${rep}
     ${j.error?`<div class="rule bad">✗ ${esc(j.error)}</div>`:''}
     ${j.applied?`<div class="status" style="color:#4ade80;">↑ now enforced — run a generation above to see it judged under the new rule.</div>`:''}
-    <details><summary style="color:#4c6fff;font-size:13px;cursor:pointer;margin-top:6px;">drafted predicate · ${esc(j.model||'')}</summary><pre>${esc(j.src||'')}</pre></details>
+    <details><summary style="color:#4c6fff;font-size:14.5px;cursor:pointer;margin-top:6px;">drafted predicate · ${esc(j.model||'')}</summary><pre>${esc(j.src||'')}</pre></details>
   </div>`;
 }
 async function authorize(){

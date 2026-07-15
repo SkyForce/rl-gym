@@ -1,0 +1,18 @@
+{
+  "name": "subnet_no_public_ip",
+  "severity": "medium",
+  "intent": "An aws_subnet must not set map_public_ip_on_launch = true (subnets should not auto-assign public IPs).",
+  "hint": "set map_public_ip_on_launch = false on the aws_subnet",
+  "pass_examples": [
+    "resource \"aws_subnet\" \"s\" {\n  vpc_id = \"vpc-1\"\n  cidr_block = \"10.0.1.0/24\"\n  map_public_ip_on_launch = false\n}",
+    "resource \"aws_instance\" \"i\" { ami = \"ami-1\" }"
+  ],
+  "fail_examples": [
+    "resource \"aws_subnet\" \"s\" {\n  vpc_id = \"vpc-1\"\n  cidr_block = \"10.0.1.0/24\"\n  map_public_ip_on_launch = true\n}",
+    "resource \"aws_subnet\" \"t\" {\n  vpc_id = \"vpc-1\"\n  cidr_block = \"10.0.2.0/24\"\n  map_public_ip_on_launch = true\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "network",
+  "_maps_to": "CKV_AWS_130"
+}

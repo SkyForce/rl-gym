@@ -231,7 +231,9 @@ def _load_specs() -> dict:
 def list_rulespecs() -> list:
     live = {nm for nm, _s, _f in scan_mod.RULES}
     return [{"name": s["name"], "severity": s.get("severity", "medium"),
-             "intent": s.get("intent", ""), "live": s["name"] in live}
+             "intent": s.get("intent", ""), "live": s["name"] in live,
+             "maps_to": s.get("_maps_to"),                     # external Checkov check the gap maps to
+             "gap": (s.get("fail_examples") or [""])[0][:600]} # a config our scanner passes, Checkov fails
             for s in _load_specs().values()]
 
 

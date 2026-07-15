@@ -1,0 +1,20 @@
+{
+  "name": "redshift_encrypted",
+  "severity": "high",
+  "intent": "An aws_redshift_cluster must set encrypted = true.",
+  "hint": "set encrypted = true on the aws_redshift_cluster",
+  "pass_examples": [
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  encrypted = true\n}",
+    "resource \"aws_vpc\" \"v\" { cidr_block = \"10.0.0.0/16\" }",
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  logging { enable = true }\n  encrypted = true\n}"
+  ],
+  "fail_examples": [
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n}",
+    "resource \"aws_redshift_cluster\" \"d\" {\n  cluster_identifier = \"d\"\n  encrypted = false\n}",
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  logging { enable = true }\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "encryption",
+  "_maps_to": "CKV_AWS_64"
+}

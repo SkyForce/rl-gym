@@ -1,0 +1,20 @@
+{
+  "name": "efs_encrypted",
+  "severity": "high",
+  "intent": "An aws_efs_file_system must set encrypted = true.",
+  "hint": "set encrypted = true on the aws_efs_file_system",
+  "pass_examples": [
+    "resource \"aws_efs_file_system\" \"f\" {\n  creation_token = \"f\"\n  encrypted = true\n}",
+    "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }",
+    "resource \"aws_efs_file_system\" \"f\" {\n  creation_token = \"f\"\n  lifecycle_policy { transition_to_ia = \"AFTER_30_DAYS\" }\n  encrypted = true\n}"
+  ],
+  "fail_examples": [
+    "resource \"aws_efs_file_system\" \"f\" {\n  creation_token = \"f\"\n}",
+    "resource \"aws_efs_file_system\" \"g\" {\n  creation_token = \"g\"\n  encrypted = false\n}",
+    "resource \"aws_efs_file_system\" \"f\" {\n  creation_token = \"f\"\n  lifecycle_policy { transition_to_ia = \"AFTER_30_DAYS\" }\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "encryption",
+  "_maps_to": "CKV_AWS_42"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "sns_encrypted",
+  "severity": "medium",
+  "intent": "An aws_sns_topic must set kms_master_key_id (encryption at rest).",
+  "hint": "set kms_master_key_id on the aws_sns_topic",
+  "pass_examples": [
+    "resource \"aws_sns_topic\" \"t\" {\n  name = \"t\"\n  kms_master_key_id = \"alias/aws/sns\"\n}",
+    "resource \"aws_sqs_queue\" \"q\" { name = \"q\" }"
+  ],
+  "fail_examples": [
+    "resource \"aws_sns_topic\" \"t\" {\n  name = \"t\"\n}",
+    "resource \"aws_sns_topic\" \"u\" {\n  name = \"u\"\n  display_name = \"u\"\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "encryption",
+  "_maps_to": "CKV_AWS_26"
+}

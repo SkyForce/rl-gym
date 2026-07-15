@@ -51,6 +51,10 @@ def main():
     ap.add_argument("--drift", default="",
                     help="continually-updated checkpoint (trained after +5 drift rules); "
                          "enables the 'policy update' demo toggle")
+    ap.add_argument("--big", default=os.environ.get("TF_BIG_MODEL", "deepseek-ai/DeepSeek-V4-Pro"),
+                    help="Token Factory big model for the live 'grow the verifier' panel "
+                         "(rule authoring). Needs TOKEN_FACTORY_API_KEY in env; the panel stays "
+                         "hidden without a key, so the no-key demo is unchanged.")
     ap.add_argument("--repair", type=int, default=1,
                     help="1 = tuned/drift columns run the self-repair pass when pass1 < 1.0")
     ap.add_argument("--port", type=int, default=8000)
@@ -382,6 +386,74 @@ def main():
                 _cache.pop(next(iter(_cache)))
             _cache[ckey] = models
         return JSONResponse({"models": models})
+
+    # ── grow the verifier: a big open model drafts a scanner rule, gates vet it, it goes
+    #    LIVE so subsequent generations are judged under it. This forward pass runs on Token
+    #    Factory (DeepSeek-V4-Pro) — the small tuned model above never authors its own judge.
+    #    The panel is hidden unless TOKEN_FACTORY_API_KEY is set, so a no-key run is unchanged.
+    import json as _json, glob
+    from ..gym.llm_client import TokenFactory
+    from ..gym import rulegen
+    _RULESPEC_DIR = os.path.join(os.path.dirname(__file__), "data", "rulespecs")
+    _tf = TokenFactory()
+    print(f"[webdemo] grow-the-verifier panel: "
+          f"{'ON (' + args.big + ')' if _tf.available() else 'off (no TOKEN_FACTORY_API_KEY)'}")
+
+    def _load_specs() -> dict:
+        specs = {}
+        for p in sorted(glob.glob(os.path.join(_RULESPEC_DIR, "*.json"))):
+            try:
+                s = _json.load(open(p))
+                specs[s["name"]] = s
+            except Exception:
+                pass
+        return specs
+
+    @app.get("/rulespecs")
+    def rulespecs():
+        if not _tf.available():                       # no key -> hide the panel entirely
+            return JSONResponse({"specs": [], "model": args.big})
+        live = {nm for nm, _s, _f in scan_mod.RULES}
+        specs = [{"name": s["name"], "severity": s.get("severity", "medium"),
+                  "intent": s.get("intent", ""), "live": s["name"] in live,
+                  "maps_to": s.get("_maps_to"),               # external Checkov check the gap maps to
+                  "gap": (s.get("fail_examples") or [""])[0][:600]}  # a config our scanner passes, Checkov fails
+                 for s in _load_specs().values()]
+        return JSONResponse({"specs": specs, "model": args.big})
+
+    @app.post("/authorize-rule")
+    def authorize_rule(body: dict):
+        name = (body.get("spec") or body.get("spec_name") or "").strip()
+        spec = _load_specs().get(name)
+        if not spec:
+            return JSONResponse({"accepted": False, "error": f"unknown spec {name!r}", "stage": "spec"})
+        if not _tf.available():
+            return JSONResponse({"accepted": False, "error": "TOKEN_FACTORY_API_KEY not set", "stage": "draft"})
+        try:                                          # big model drafts the predicate (network)
+            res = rulegen.author(spec, args.big,
+                                 drafter=lambda msgs: _tf.chat(args.big, msgs, temperature=0.2))
+        except Exception as e:
+            return JSONResponse({"accepted": False, "error": f"{type(e).__name__}: {e}", "stage": "draft"})
+        applied = False
+        if res.get("accepted"):
+            try:
+                fn = rulegen.safe_compile(res["src"])
+                with lock:                            # brief mutation under the serving lock
+                    scan_mod.RULES = [r for r in scan_mod.RULES if r[0] != spec["name"]] \
+                        + [(spec["name"], spec["severity"], fn)]
+                    scan_mod.FIX_HINTS[spec["name"]] = spec.get("hint", "")
+                    _cache.clear()                    # re-judge cached generations under the new rule
+                applied = True
+            except Exception as e:
+                res["accepted"] = False
+                res["error"] = f"apply failed: {type(e).__name__}: {e}"
+        n_ex = len(spec.get("pass_examples", [])) + len(spec.get("fail_examples", []))
+        return JSONResponse({"accepted": bool(res.get("accepted")), "stage": res.get("stage"),
+                             "report": res.get("report", []), "src": res.get("src", ""),
+                             "error": res.get("error"), "applied": applied, "n_examples": n_ex,
+                             "model": args.big,
+                             "rule": {"name": spec["name"], "severity": spec["severity"],
+                                      "intent": spec.get("intent", "")}})
 
     import uvicorn
     print(f"[webdemo] serving on 0.0.0.0:{args.port}")

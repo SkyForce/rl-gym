@@ -102,6 +102,10 @@ if [ -n "${WEBDEMO:-}" ]; then
   ARGS+=( --env "WEBDEMO=1" --container-port 8000 )
   # frontier API comparison column (quality + $/request); omit the key to disable
   [ -n "${ANTHROPIC_API_KEY:-}" ] && ARGS+=( --env "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" )
+  # grow-the-verifier panel: live rule authoring by the big model on Token Factory.
+  # Omit the key and the panel stays hidden (generation-only demo). TF_BIG_MODEL overrides.
+  [ -n "${TOKEN_FACTORY_API_KEY:-}" ] && ARGS+=( --env "TOKEN_FACTORY_API_KEY=$TOKEN_FACTORY_API_KEY" )
+  [ -n "${TF_BIG_MODEL:-}" ]          && ARGS+=( --env "TF_BIG_MODEL=$TF_BIG_MODEL" )
 fi
 # SSH rescue hatch: without a key at create time, a live job cannot be entered or
 # fixed in place (learned when the tunnel died in an otherwise-healthy demo job)

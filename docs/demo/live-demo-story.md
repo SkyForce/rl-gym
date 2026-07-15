@@ -36,7 +36,7 @@ Two gates: it can only use regex and strings, and it must pass every example. Th
 open model is safe as the author — it never gets to *be* the judge."
 
 ### ACT 3 — The whole loop, live on Token Factory
-**What runs:** `demo_e2e.py` against Qwen3-235B — a 235B open model writes Terraform, the verifier
+**What runs:** `demo_e2e.py` against DeepSeek-V4-Pro — a big open model writes Terraform, the verifier
 judges it, the model repairs its own findings, then **authors a new gated rule** live.
 **The wow:** it's all real, all serverless, all open-weight, and it costs a few cents.
 **Say:** "Big model writes and repairs, deterministic verifier judges, new rule gets vetted and

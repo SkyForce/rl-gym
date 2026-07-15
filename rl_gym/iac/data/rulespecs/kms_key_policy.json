@@ -1,0 +1,16 @@
+{
+ "name": "kms_key_policy",
+ "_maps_to": "CKV2_AWS_64",
+ "severity": "high",
+ "intent": "An aws_kms_key must have a key policy defined — either an inline `policy` attribute on the key, or a separate aws_kms_key_policy resource that targets it — so access to the CMK is explicitly scoped rather than left to the permissive AWS default.",
+ "hint": "add a policy to the aws_kms_key (inline policy = jsonencode({...}) or a separate aws_kms_key_policy resource)",
+ "pass_examples": [
+  "resource \"aws_kms_key\" \"k\" {\n  description = \"app key\"\n  policy = jsonencode({ Version = \"2012-10-17\", Statement = [] })\n}",
+  "resource \"aws_kms_key\" \"k\" {\n  description = \"app key\"\n}\nresource \"aws_kms_key_policy\" \"kp\" {\n  key_id = aws_kms_key.k.id\n  policy = jsonencode({ Version = \"2012-10-17\" })\n}",
+  "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }"
+ ],
+ "fail_examples": [
+  "resource \"aws_kms_key\" \"k\" {\n  description = \"app key\"\n  enable_key_rotation = true\n}",
+  "resource \"aws_kms_key\" \"k\" {\n  deletion_window_in_days = 10\n}"
+ ]
+}

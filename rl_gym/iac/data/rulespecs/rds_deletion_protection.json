@@ -1,14 +1,15 @@
 {
-  "name": "rds_deletion_protection",
-  "severity": "medium",
-  "intent": "An aws_db_instance must set deletion_protection = true so a production database cannot be dropped by an accidental terraform destroy or console click.",
-  "hint": "set deletion_protection = true on the aws_db_instance",
-  "pass_examples": [
-    "resource \"aws_db_instance\" \"pg\" {\n  engine = \"postgres\"\n  instance_class = \"db.t3.medium\"\n  storage_encrypted = true\n  deletion_protection = true\n}",
-    "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }"
-  ],
-  "fail_examples": [
-    "resource \"aws_db_instance\" \"pg\" {\n  engine = \"mysql\"\n  instance_class = \"db.t3.small\"\n  storage_encrypted = true\n}",
-    "resource \"aws_db_instance\" \"pg\" {\n  engine = \"postgres\"\n  deletion_protection = false\n}"
-  ]
+ "name": "rds_deletion_protection",
+ "_maps_to": "CKV_AWS_293",
+ "severity": "medium",
+ "intent": "An aws_db_instance must set deletion_protection = true so a production database cannot be dropped by an accidental terraform destroy or console click.",
+ "hint": "set deletion_protection = true on the aws_db_instance",
+ "pass_examples": [
+  "resource \"aws_db_instance\" \"pg\" {\n  engine = \"postgres\"\n  instance_class = \"db.t3.medium\"\n  storage_encrypted = true\n  deletion_protection = true\n}",
+  "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }"
+ ],
+ "fail_examples": [
+  "resource \"aws_db_instance\" \"pg\" {\n  engine = \"mysql\"\n  instance_class = \"db.t3.small\"\n  storage_encrypted = true\n}",
+  "resource \"aws_db_instance\" \"pg\" {\n  engine = \"postgres\"\n  deletion_protection = false\n}"
+ ]
 }

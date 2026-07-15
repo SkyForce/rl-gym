@@ -1,0 +1,18 @@
+{
+  "name": "eks_no_public_endpoint",
+  "severity": "high",
+  "intent": "An aws_eks_cluster must not enable a public API endpoint (endpoint_public_access = true).",
+  "hint": "set endpoint_public_access = false (or restrict public_access_cidrs) in the eks vpc_config",
+  "pass_examples": [
+    "resource \"aws_eks_cluster\" \"c\" {\n  name = \"c\"\n  vpc_config { endpoint_public_access = false endpoint_private_access = true }\n}",
+    "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }"
+  ],
+  "fail_examples": [
+    "resource \"aws_eks_cluster\" \"c\" {\n  name = \"c\"\n  vpc_config { endpoint_public_access = true }\n}",
+    "resource \"aws_eks_cluster\" \"d\" {\n  name = \"d\"\n  vpc_config { endpoint_public_access = true endpoint_private_access = false }\n}"
+  ],
+  "_tier": "per_resource",
+  "_serve": "reward",
+  "_category": "network",
+  "_maps_to": "CKV_AWS_39"
+}

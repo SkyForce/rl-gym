@@ -1,0 +1,20 @@
+{
+  "name": "redshift_public",
+  "severity": "high",
+  "intent": "An aws_redshift_cluster must not set publicly_accessible = true.",
+  "hint": "set publicly_accessible = false on the aws_redshift_cluster",
+  "pass_examples": [
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  publicly_accessible = false\n}",
+    "resource \"aws_vpc\" \"v\" { cidr_block = \"10.0.0.0/16\" }",
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  logging { enable = true }\n  publicly_accessible = false\n}"
+  ],
+  "fail_examples": [
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  publicly_accessible = true\n}",
+    "resource \"aws_redshift_cluster\" \"d\" {\n  cluster_identifier = \"d\"\n  encrypted = true\n  publicly_accessible = true\n}",
+    "resource \"aws_redshift_cluster\" \"c\" {\n  cluster_identifier = \"c\"\n  logging { enable = true }\n  publicly_accessible = true\n}"
+  ],
+  "_tier": "value",
+  "_serve": "reward",
+  "_category": "network",
+  "_maps_to": "CKV_AWS_87"
+}
