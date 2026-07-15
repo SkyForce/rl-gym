@@ -330,6 +330,10 @@ preventing anyone from building a *closed* product or hosted service on it.
 **Commercial licenses** — for building a proprietary product or service on rl-gym *without* the
 AGPL copyleft obligation — are available from the author. Open an issue or get in touch.
 
+**Contributing** — PRs welcome under a short [Contributor License Agreement](CLA.md): you keep
+ownership of your work, and the maintainer keeps the right to license future versions (so the
+project's licensing can evolve). See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 **Bundled data keeps its upstream license.** The Checkov test fixtures
 (`rl_gym/iac/data/checkov_tf.jsonl`, `github_tf.jsonl`) come from
 [bridgecrewio/checkov](https://github.com/bridgecrewio/checkov) (Apache-2.0, attributed per
