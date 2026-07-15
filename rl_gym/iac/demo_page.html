@@ -147,13 +147,11 @@ async function run(){
   const body={req:document.getElementById('req').value,
               required:document.getElementById('required').value.split(',').map(x=>x.trim()).filter(Boolean),
               drift:driftOn, engines:['tuned']};
-  // best-of-4 everywhere (the real product, robust to per-sample noise). policy shows
-  // the before/after as two cards; clean/free-form fold auto-repair into one card.
-  // before/after showcases pin best-of-4 so the first attempt is always parseable and
-  // imperfect (pass@1 can occasionally whiff) — the fix stays reliably visible. Clean
-  // chips + free-form use the pass@1 + repair default (the recommended serving mode).
-  if(MODE==='repair'||MODE==='policy'){body.repair_ab=true; body.n=4;}
-  s.textContent='generating… (~15s)';
+  // pass@1 + self-repair everywhere — the real serving mode. Showcase chips add
+  // repair_ab so the first attempt and the repaired result render as two cards; if
+  // pass@1 is already clean it folds into one card (nothing to repair).
+  if(MODE==='repair'||MODE==='policy'){body.repair_ab=true;}
+  s.textContent='generating… (~8s)';
   try{
     const r=await fetch('/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const j=await r.json();
