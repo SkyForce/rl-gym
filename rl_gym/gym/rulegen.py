@@ -127,6 +127,14 @@ Policy ({spec['name']}, severity {spec['severity']}): {spec['intent']}
 Constraints: use ONLY the `re` module and string operations. No imports (re is provided),
 no file/network/eval. The function must return "na" when the relevant resource is absent.
 
+Robustness — IMPORTANT: real Terraform resource blocks contain NESTED braces (e.g. a `tags`
+block). Do NOT try to slice a resource block with a character class that stops at the first
+closing brace — it misses everything after the nested brace and wrongly returns "na".
+Prefer a WHOLE-CONFIG check: if the resource type appears in `hcl`, test whether the required
+attribute appears ANYWHERE in the config text (e.g. search `hcl` for `deletion_protection = true`)
+and return "fail" if the resource is present but that attribute is not. Keep it simple and
+brace-agnostic so it works on real, fully-configured resources — not just minimal snippets.
+
 It MUST classify these correctly:
 {ex('PASS (want pass or na)', spec.get('pass_examples', []))}
 {ex('FAIL (want fail)', spec.get('fail_examples', []))}

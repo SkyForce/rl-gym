@@ -5,10 +5,11 @@
  "intent": "An aws_db_instance must set deletion_protection = true so a production database cannot be dropped by an accidental terraform destroy or console click.",
  "hint": "set deletion_protection = true on the aws_db_instance",
  "pass_examples": [
-  "resource \"aws_db_instance\" \"pg\" {\n  engine = \"postgres\"\n  instance_class = \"db.t3.medium\"\n  storage_encrypted = true\n  deletion_protection = true\n}",
+  "resource \"aws_db_instance\" \"billing\" {\n  identifier              = \"billing\"\n  engine                  = \"postgres\"\n  instance_class          = \"db.t3.small\"\n  allocated_storage       = 20\n  storage_encrypted       = true\n  publicly_accessible     = false\n  backup_retention_period = 7\n  multi_az                = true\n  manage_master_user_password = true\n  skip_final_snapshot     = true\n  deletion_protection     = true\n  tags = {\n    env  = \"prod\"\n    team = \"billing\"\n  }\n}",
   "resource \"aws_s3_bucket\" \"b\" { bucket = \"x\" }"
  ],
  "fail_examples": [
+  "resource \"aws_db_instance\" \"billing\" {\n  identifier              = \"billing\"\n  engine                  = \"postgres\"\n  instance_class          = \"db.t3.small\"\n  allocated_storage       = 20\n  storage_encrypted       = true\n  publicly_accessible     = false\n  backup_retention_period = 7\n  multi_az                = true\n  manage_master_user_password = true\n  skip_final_snapshot     = true\n  tags = {\n    env  = \"prod\"\n    team = \"billing\"\n  }\n}",
   "resource \"aws_db_instance\" \"pg\" {\n  engine = \"mysql\"\n  instance_class = \"db.t3.small\"\n  storage_encrypted = true\n}",
   "resource \"aws_db_instance\" \"pg\" {\n  engine = \"postgres\"\n  deletion_protection = false\n}"
  ]
